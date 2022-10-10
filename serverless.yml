@@ -28,8 +28,12 @@ functions:
     handler: handler.upload_file
     events:
       - http:
-          path: upload
-          method: post
+          path: upload/{key}
+          method: get
+          request:
+            parameters:
+              paths:
+                key: true
   list:
     handler: handler.file_list
     events:
