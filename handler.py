@@ -3,7 +3,9 @@ from datetime import datetime
 import json
 import boto3
 from cgi import FieldStorage
+from boto3.s3.transfer import TransferConfig
 
+MB = 1024 ** 2
 BUCKET_NAME = "serverless-demo-bucket-amns"
 
 def download_file(event, context):
@@ -20,8 +22,9 @@ def upload_file(event, context):
     )['file']
     originalFileName = fs.filename
     content_type = fs.type
-    binaryFileData = fs.file.read().decode()
-    response = client.put_object(Body=binaryFileData, Bucket=BUCKET_NAME, Key=f"{str(datetime.timestamp(datetime.now())).replace('.', '')}_{originalFileName}", ContentType=content_type)
+    binaryFileData = fs.file #.read().decode()
+    config = TransferConfig(multipart_threshold=5*MB, max_concurrency=5)
+    response = client.upload_fileobj(binaryFileData, BUCKET_NAME, f"{str(datetime.timestamp(datetime.now())).replace('.', '')}_{originalFileName}", ExtraArgs={'ContentType': content_type}, Config=config)
     body = {
         "message": "Successful"
     }
