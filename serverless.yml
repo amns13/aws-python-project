@@ -1,0 +1,38 @@
+org: amns13
+app: aws-python-project
+service: aws-python-project
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - s3:*
+    Resource: "*"
+
+functions:
+  download:
+    handler: handler.download_file
+    events:
+      - http:
+          path: download/{key}
+          method: get
+          request:
+            parameters:
+              paths:
+                key: true
+  upload:
+    handler: handler.upload_file
+    events:
+      - http:
+          path: upload
+          method: post
+  list:
+    handler: handler.file_list
+    events:
+      - http:
+          path: list
+          method: get
